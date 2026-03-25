@@ -1,0 +1,25 @@
+# uEnv-initrd.txt -- U-Boot environment for Alpine Linux initrd boot
+#
+# Memory layout:
+#
+#   0x2000000  +------------+
+#              | initrd.dtb |  <- device tree blob
+#   0x2008000  +------------+
+#              | zImage.bin |  <- ARM Linux kernel (zImage format)
+#              |            |
+#   0x3000000  +------------+
+#              | initrd.bin |  <- Alpine initramfs, fixed size 4 MiB
+#   0x3400000  +------------+
+#
+# bootz expects the initrd argument as addr:size in hex.
+# 4 MiB = 0x400000, so the argument is ${rdaddr}:400000.
+#
+# U-Boot loads this file from the FAT partition at startup and evaluates
+# bootcmd. To change boot arguments or load addresses, edit this file and
+# copy it to the SD card FAT partition as uEnv.txt. No recompilation needed.
+
+dtbaddr=0x2000000
+loadaddr=0x2008000
+rdaddr=0x3000000
+bootargs=console=ttyPS0,115200 earlycon earlyprintk initrd=0x3000000,4M modloop=modloop cma=36M
+bootcmd=fatload mmc 0 ${dtbaddr} initrd.dtb; fatload mmc 0 ${loadaddr} zImage.bin; fatload mmc 0 ${rdaddr} initrd.bin; bootz ${loadaddr} ${rdaddr}:400000 ${dtbaddr}

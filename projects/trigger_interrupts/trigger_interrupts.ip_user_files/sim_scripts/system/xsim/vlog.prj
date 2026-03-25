@@ -1,0 +1,63 @@
+verilog xil_defaultlib --include "/tools/Xilinx/Vivado/2024.1/data/xilinx_vip/include" --include "../../../../trigger_interrupts.gen/sources_1/bd/system/ipshared/3242" --include "../../../../trigger_interrupts.gen/sources_1/bd/system/ipshared/ec67/hdl" --include "../../../../trigger_interrupts.gen/sources_1/bd/system/ipshared/b28c/hdl" --include "../../../../trigger_interrupts.gen/sources_1/bd/system/ipshared/434f/hdl" \
+"../../../bd/system/ip/system_pll_0_0/system_pll_0_0_clk_wiz.v" \
+"../../../bd/system/ip/system_pll_0_0/system_pll_0_0.v" \
+"../../../bd/system/ip/system_ps_0_0/sim/system_ps_0_0.v" \
+"../../../bd/system/ip/system_const_0_0/sim/system_const_0_0.v" \
+"../../../bd/system/ipshared/6dd9/56ac/axis_red_pitaya_adc.v" \
+"../../../bd/system/ip/system_adc_0_0/sim/system_adc_0_0.v" \
+"../../../bd/system/ipshared/a929/56ac/axis_gpio_reader.v" \
+"../../../bd/system/ip/system_gpio_0_0/sim/system_gpio_0_0.v" \
+"../../../bd/system/ipshared/cbe4/8e04/inout_buffer.v" \
+"../../../bd/system/ipshared/cbe4/8e04/input_buffer.v" \
+"../../../bd/system/ipshared/cbe4/8e04/output_buffer.v" \
+"../../../bd/system/ipshared/cbe4/56ac/axi_hub.v" \
+"../../../bd/system/ip/system_hub_0_0/sim/system_hub_0_0.v" \
+"../../../bd/system/ipshared/1dd6/56ac/port_slicer.v" \
+"../../../bd/system/ip/system_slice_0_0/sim/system_slice_0_0.v" \
+"../../../bd/system/ip/system_slice_1_0/sim/system_slice_1_0.v" \
+"../../../bd/system/ip/system_slice_2_0/sim/system_slice_2_0.v" \
+"../../../bd/system/ip/system_slice_3_0/sim/system_slice_3_0.v" \
+"../../../bd/system/ip/system_slice_4_0/sim/system_slice_4_0.v" \
+"../../../bd/system/ip/system_slice_5_0/sim/system_slice_5_0.v" \
+"../../../bd/system/ip/system_slice_6_0/sim/system_slice_6_0.v" \
+"../../../bd/system/ip/system_slice_7_0/sim/system_slice_7_0.v" \
+"../../../bd/system/ip/system_slice_8_0/sim/system_slice_8_0.v" \
+"../../../bd/system/ip/system_bcast_0_0/hdl/tdata_system_bcast_0_0.v" \
+"../../../bd/system/ip/system_bcast_0_0/hdl/tuser_system_bcast_0_0.v" \
+"../../../bd/system/ip/system_bcast_0_0/hdl/top_system_bcast_0_0.v" \
+"../../../bd/system/ip/system_bcast_0_0/sim/system_bcast_0_0.v" \
+"../../../bd/system/ipshared/6820/56ac/axis_variable.v" \
+"../../../bd/system/ip/system_rate_0_0/sim/system_rate_0_0.v" \
+"../../../bd/system/ip/system_rate_1_0/sim/system_rate_1_0.v" \
+"../../../bd/system/ip/system_comb_0_0/sim/system_comb_0_0.v" \
+"../../../bd/system/ipshared/cd40/56ac/axis_trigger.v" \
+"../../../bd/system/ip/system_trig_0_0/sim/system_trig_0_0.v" \
+"../../../bd/system/ipshared/8206/56ac/axis_oscilloscope.v" \
+"../../../bd/system/ip/system_scope_0_0/sim/system_scope_0_0.v" \
+"../../../bd/system/ip/system_const_1_0/sim/system_const_1_0.v" \
+"../../../bd/system/ipshared/127f/56ac/axis_ram_writer.v" \
+"../../../bd/system/ip/system_writer_0_0/sim/system_writer_0_0.v" \
+"../../../bd/system/ip/system_concat_0_0/sim/system_concat_0_0.v" \
+"../../../bd/system/ip/system_axis_trigger_0_0/sim/system_axis_trigger_0_0.v" \
+"../../../bd/system/ip/system_xlconstant_0_0/sim/system_xlconstant_0_0.v" \
+"../../../bd/system/ip/system_xlconstant_1_0/sim/system_xlconstant_1_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_1_0/hdl/tdata_system_axis_broadcaster_1_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_1_0/hdl/tuser_system_axis_broadcaster_1_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_1_0/hdl/top_system_axis_broadcaster_1_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_1_0/sim/system_axis_broadcaster_1_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_2_0/hdl/tdata_system_axis_broadcaster_2_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_2_0/hdl/tuser_system_axis_broadcaster_2_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_2_0/hdl/top_system_axis_broadcaster_2_0.v" \
+"../../../bd/system/ip/system_axis_broadcaster_2_0/sim/system_axis_broadcaster_2_0.v" \
+"../../../bd/system/ip/system_or_gate_0_0/sim/system_or_gate_0_0.v" \
+"../../../bd/system/ip/system_comb_0_1/sim/system_comb_0_1.v" \
+"../../../bd/system/ip/system_xlconcat_0_0/sim/system_xlconcat_0_0.v" \
+"../../../bd/system/ipshared/355b/56ac/axis_counter.v" \
+"../../../bd/system/ip/system_axis_counter_0_0/sim/system_axis_counter_0_0.v" \
+"../../../bd/system/ip/system_xlconstant_2_0/sim/system_xlconstant_2_0.v" \
+"../../../bd/system/sim/system.v" \
+
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
