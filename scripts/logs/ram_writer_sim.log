@@ -1,0 +1,11 @@
+# vsim -t 1ps -voptargs="+acc" "+nowarnTFMPC" -c -do "run -all; quit -f" tb_axis_ram_writer "+VECTORS_DIR=../sim/vectors" -l logs/ram_writer_sim.log 
+# Start time: 19:45:09 on Mar 25,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Error (suppressible): ../tb/unit/tb_axis_ram_writer.sv(112): (vopt-2732) Module parameter 'AXIS_DATA_WIDTH' not found for override.
+# ** Error (suppressible): ../tb/unit/tb_axis_ram_writer.sv(112): (vopt-2732) Module parameter 'AXI_DATA_WIDTH' not found for override.
+# ** Error (suppressible): ../tb/unit/tb_axis_ram_writer.sv(112): (vopt-2732) Module parameter 'AXI_ADDR_WIDTH' not found for override.
+# ** Error (suppressible): ../tb/unit/tb_axis_ram_writer.sv(112): (vopt-2732) Module parameter 'AXI_ID_WIDTH' not found for override.
+# Optimization failed
+# Error loading design
+# End time: 19:45:09 on Mar 25,2026, Elapsed time: 0:00:00
+# Errors: 4, Warnings: 0

@@ -1,0 +1,9 @@
+============================================================
+TEST VECTOR GENERATION REPORT
+============================================================
+
+Test name: rw_partial_100
+Total samples: 100
+Packet sizes: [100]
+Expected bytes: 400
+Estimated bursts: 1

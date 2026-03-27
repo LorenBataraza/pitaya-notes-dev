@@ -1,0 +1,81 @@
+# //  Questa Sim-64
+# //  Version 10.7c linux_x86_64 Aug 17 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim -t 1ps -voptargs="+acc" "+nowarnTFMPC" -do "questa/wave_setup.do" -do "source questa/wave_trigger.do" tb_axis_trigger "+VECTORS_DIR=../sim/vectors" 
+# Start time: 00:40:18 on Mar 27,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# Loading sv_std.std
+# Loading work.axi_stream_pkg(fast)
+# Loading work.tb_axis_trigger(fast)
+# Loading work.axis_trigger(fast)
+# do questa/wave_setup.do
+# 1
+# 1
+# ** Error: unknown option "-foregroundcolor"
+# Error in macro ./questa/wave_setup.do line 25
+# unknown option "-foregroundcolor"
+#     while executing
+# "configure wave -foregroundcolor White"
+# source questa/wave_trigger.do
+# unknown option "-foregroundcolor"
+add wave -position end sim:/tb_axis_trigger/dut/#ASSIGN#149/*
+# (vish-4014) No objects found matching '/tb_axis_trigger/dut/#ASSIGN#149/*'.
+add wave -position end sim:/tb_axis_trigger/dut/#ASSIGN#149/*
+# (vish-4014) No objects found matching '/tb_axis_trigger/dut/#ASSIGN#149/*'.
+add wave -position end  sim:/tb_axis_trigger/dut/aclk
+add wave -position end  sim:/tb_axis_trigger/dut/aresetn
+add wave -position end  sim:/tb_axis_trigger/dut/config_i
+add wave -position end  sim:/tb_axis_trigger/dut/s_axis_tdata
+add wave -position end  sim:/tb_axis_trigger/dut/s_axis_tvalid
+add wave -position end  sim:/tb_axis_trigger/dut/s_axis_tready
+add wave -position end  sim:/tb_axis_trigger/dut/m_axis_tdata
+add wave -position end  sim:/tb_axis_trigger/dut/m_axis_tvalid
+add wave -position end  sim:/tb_axis_trigger/dut/m_axis_tready
+add wave -position end  sim:/tb_axis_trigger/dut/trigger_out
+add wave -position end  sim:/tb_axis_trigger/dut/sample_pipe
+add wave -position end  sim:/tb_axis_trigger/dut/valid_pipe
+add wave -position end  sim:/tb_axis_trigger/dut/prev_sample
+add wave -position end  sim:/tb_axis_trigger/dut/curr_sample
+add wave -position end  sim:/tb_axis_trigger/dut/threshold_event
+add wave -position end  sim:/tb_axis_trigger/dut/trigger_armed
+add wave -position end  sim:/tb_axis_trigger/dut/axis_handshake
+run
+# 
+# 
+# ╔═══════════════════════════════════════════════════════════╗
+# ║     TESTBENCH: axis_trigger (QuestaSim Flow)             ║
+# ╚═══════════════════════════════════════════════════════════╝
+# Vectors directory: ../sim/vectors
+# 
+# ========== Test: trigger_rising_ramp ==========
+# [CONFIG] Threshold=500, Mode=0, Samples=1000
+# [LOAD] Leyendo estímulos: ../sim/vectors/trigger_rising_ramp_stimulus.hex
+# [LOAD] Leyendo esperados: ../sim/vectors/trigger_rising_ramp_expected.hex
+run
+run
+run
+run
+run
+run
+# [CONFIG] Trigger configurado: threshold=500, mode=TRIG_RISING
+# [TEST] Enviando 1000 muestras...
+run
+run
+run
+restart
+run
+# [3964000] FALSE NEGATIVE: Esperado trigger en muestra 488
+# [7892000] FALSE POSITIVE: Trigger en muestra 979
+# End time: 00:43:43 on Mar 27,2026, Elapsed time: 0:03:25
+# Errors: 6, Warnings: 0

@@ -1,0 +1,6 @@
+// Trigger events detected: 3
+// Format: INDEX VALUE PREV_VALUE
+
+729 588 573
+1479 588 573
+2229 588 573

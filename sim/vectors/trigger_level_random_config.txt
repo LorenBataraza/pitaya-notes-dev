@@ -1,0 +1,7 @@
+// Test configuration file
+// Format: PARAMETER VALUE
+
+ENABLE 1
+THRESHOLD 400
+MODE 3
+NUM_SAMPLES 1000

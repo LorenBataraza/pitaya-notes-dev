@@ -152,7 +152,7 @@ PROJ_DIR = tmp/$(NAME)
 ## @brief List of all Verilog core sources found under cores/.
 ## @details $(wildcard ...) is expanded at parse time, before any rule runs,
 ##          so it captures the directory contents as they exist on disk.
-FILES = $(wildcard cores/*.v)
+FILES = $(shell find cores -name '*.v' -type f)
 
 ## @brief Core names derived from FILES, with the path prefix and .v stripped.
 ## @details The substitution $(FILES:.v=) removes the .v suffix, leaving paths

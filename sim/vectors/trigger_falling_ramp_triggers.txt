@@ -1,0 +1,3 @@
+// Trigger events detected: 0
+// Format: INDEX VALUE PREV_VALUE
+

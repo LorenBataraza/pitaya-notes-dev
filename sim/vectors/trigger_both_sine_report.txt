@@ -1,0 +1,12 @@
+============================================================
+TEST VECTOR GENERATION REPORT
+============================================================
+
+Test name: trigger_both_sine
+Signal type: sine
+Number of samples: 2000
+Threshold: 512
+Mode: BOTH
+Triggers detected: 3
+Min signal value: 112
+Max signal value: 911

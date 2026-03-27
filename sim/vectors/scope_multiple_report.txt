@@ -1,0 +1,12 @@
+============================================================
+TEST VECTOR GENERATION REPORT
+============================================================
+
+Test name: scope_multiple
+Total samples: 5000
+Pre-trigger samples: 100
+Post-trigger samples: 200
+Window size: 300
+Number of triggers: 3
+Trigger positions: [1000, 2500, 4000]
+Total output samples: 900

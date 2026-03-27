@@ -1,0 +1,4 @@
+// Trigger positions (one per line)
+1000
+2500
+4000
