@@ -37,8 +37,8 @@ endif
 CXX      = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -g
 CXXFLAGS += -I$(SYSTEMC_INC)
-CXXFLAGS += -I../common
-CXXFLAGS += -I..
+CXXFLAGS += -I./common
+CXXFLAGS += -I.
 
 LDFLAGS  = -L$(SYSTEMC_LIB)
 LDLIBS   = -lsystemc -lm -lpthread
@@ -148,10 +148,30 @@ run_trigger: $(TRIGGER_BIN)
 run_trigger_all: $(TRIGGER_BIN)
 	@mkdir -p $(LOG_DIR)
 	@echo ">>> Ejecutando todos los tests TLM del trigger..."
-	$(TRIGGER_BIN) --vectors=$(VECTORS_DIR) --all \
-		--log=$(LOG_DIR)/trigger_tlm_regression.log
-	@echo ">>> Log guardado en: $(LOG_DIR)/trigger_tlm_regression.log"
-	@tail -25 $(LOG_DIR)/trigger_tlm_regression.log
+	@echo "============================================================" > $(LOG_DIR)/trigger_tlm_regression.log
+	@echo "REGRESSION TLM - TRIGGER" >> $(LOG_DIR)/trigger_tlm_regression.log
+	@echo "============================================================" >> $(LOG_DIR)/trigger_tlm_regression.log
+	@PASSED=0; FAILED=0; \
+	for TEST in trigger_rising_ramp trigger_falling_ramp trigger_both_sine trigger_rising_pulse trigger_level_random; do \
+		echo ""; \
+		echo ">>> Test: $$TEST"; \
+		$(TRIGGER_BIN) --vectors=$(VECTORS_DIR) --test=$$TEST \
+			--log=$(LOG_DIR)/trigger_tlm_$$TEST.log; \
+		if [ $$? -eq 0 ]; then \
+			echo "    PASSED"; \
+			PASSED=$$((PASSED+1)); \
+		else \
+			echo "    FAILED"; \
+			FAILED=$$((FAILED+1)); \
+		fi; \
+		cat $(LOG_DIR)/trigger_tlm_$$TEST.log >> $(LOG_DIR)/trigger_tlm_regression.log; \
+	done; \
+	echo ""; \
+	echo "============================================================"; \
+	echo "RESUMEN: $$PASSED passed, $$FAILED failed"; \
+	echo "============================================================"; \
+	echo "Log completo: $(LOG_DIR)/trigger_tlm_regression.log"; \
+	test $$FAILED -eq 0
 
 # -----------------------------------------------------------------------------
 # Limpieza

@@ -34,7 +34,7 @@
 #include <tlm_utils/simple_initiator_socket.h>
 #include <queue>
 #include <fstream>
-#include "axis_tlm_types.h"
+#include "common/axis_tlm_types.h"
 
 namespace mcpha {
 

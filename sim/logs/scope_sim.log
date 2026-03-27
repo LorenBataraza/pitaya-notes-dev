@@ -1,7 +1,6 @@
 # vsim -t 1ps -voptargs="+acc" "+nowarnTFMPC" -c -do "run -all; quit -f" tb_axis_scope "+VECTORS_DIR=../sim/vectors" -l ../sim/logs/scope_sim.log 
-# Start time: 01:17:49 on Mar 27,2026
-# ** Note: (vsim-3812) Design is being optimized...
-# ** Note: (vopt-143) Recognized 1 FSM in module "axis_scope(fast)".
+# Start time: 18:53:25 on Mar 27,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
 # //  Questa Sim-64
 # //  Version 10.7c linux_x86_64 Aug 17 2018
 # //
@@ -36,5 +35,5 @@
 #    Time: 800 us  Scope: tb_axis_scope File: ../tb/unit/tb_axis_scope.sv Line: 495
 # ** Note: $finish    : ../tb/unit/tb_axis_scope.sv(496)
 #    Time: 800 us  Iteration: 0  Instance: /tb_axis_scope
-# End time: 01:17:50 on Mar 27,2026, Elapsed time: 0:00:01
-# Errors: 1, Warnings: 0, Suppressed Warnings: 1
+# End time: 18:53:25 on Mar 27,2026, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
