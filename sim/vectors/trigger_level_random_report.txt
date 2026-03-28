@@ -7,6 +7,6 @@ Signal type: random
 Number of samples: 1000
 Threshold: 400
 Mode: LEVEL
-Triggers detected: 237
+Triggers detected: 239
 Min signal value: 0
-Max signal value: 1023
+Max signal value: 1022

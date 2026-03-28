@@ -290,7 +290,7 @@ module axis_ram_writer
                 end
             end
             
-            if (state == ST_IDLE) begin
+            if (state == WR_IDLE) begin
                 last_seen <= 1'b0;
             end
         end

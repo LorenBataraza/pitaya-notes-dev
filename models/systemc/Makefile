@@ -67,12 +67,12 @@ TRIGGER_SRC = trigger/tb_trigger_tlm.cpp
 TRIGGER_HDR = trigger/trigger_tlm.h common/axis_tlm_types.h
 TRIGGER_BIN = $(BIN_DIR)/tb_trigger_tlm
 
-# Scope (futuro)
+# Scope
 SCOPE_SRC   = scope/tb_scope_tlm.cpp
 SCOPE_HDR   = scope/scope_tlm.h common/axis_tlm_types.h
 SCOPE_BIN   = $(BIN_DIR)/tb_scope_tlm
 
-# RAM Writer (futuro)
+# RAM Writer
 RW_SRC      = ram_writer/tb_ram_writer_tlm.cpp
 RW_HDR      = ram_writer/ram_writer_tlm.h common/axis_tlm_types.h
 RW_BIN      = $(BIN_DIR)/tb_ram_writer_tlm
@@ -81,9 +81,9 @@ RW_BIN      = $(BIN_DIR)/tb_ram_writer_tlm
 # Targets principales
 # -----------------------------------------------------------------------------
 
-.PHONY: all clean help run_trigger run_trigger_all
+.PHONY: all clean help run_trigger run_trigger_all run_scope run_scope_all run_rw run_rw_all
 
-all: tb_trigger
+all: tb_trigger tb_scope tb_ram_writer
 
 help:
 	@echo "============================================================"
@@ -171,6 +171,68 @@ run_trigger_all: $(TRIGGER_BIN)
 	echo "RESUMEN: $$PASSED passed, $$FAILED failed"; \
 	echo "============================================================"; \
 	echo "Log completo: $(LOG_DIR)/trigger_tlm_regression.log"; \
+	test $$FAILED -eq 0
+
+# -----------------------------------------------------------------------------
+# Ejecución - Scope
+# -----------------------------------------------------------------------------
+
+SCOPE_TEST ?= scope_single
+
+run_scope: $(SCOPE_BIN)
+	@mkdir -p $(LOG_DIR)
+	@echo ">>> Ejecutando test TLM scope: $(SCOPE_TEST)..."
+	$(SCOPE_BIN) --vectors=$(VECTORS_DIR) --test=$(SCOPE_TEST) \
+		--log=$(LOG_DIR)/scope_tlm_$(SCOPE_TEST).log
+	@echo ">>> Log: $(LOG_DIR)/scope_tlm_$(SCOPE_TEST).log"
+	@tail -15 $(LOG_DIR)/scope_tlm_$(SCOPE_TEST).log
+
+run_scope_all: $(SCOPE_BIN)
+	@mkdir -p $(LOG_DIR)
+	@echo ">>> Ejecutando todos los tests TLM del scope..."
+	@PASSED=0; FAILED=0; \
+	for TEST in scope_single scope_multiple scope_edge_start scope_edge_end scope_large_pre; do \
+		echo ">>> Test: $$TEST"; \
+		$(SCOPE_BIN) --vectors=$(VECTORS_DIR) --test=$$TEST \
+			--log=$(LOG_DIR)/scope_tlm_$$TEST.log; \
+		if [ $$? -eq 0 ]; then \
+			echo "    PASSED"; PASSED=$$((PASSED+1)); \
+		else \
+			echo "    FAILED"; FAILED=$$((FAILED+1)); \
+		fi; \
+	done; \
+	echo "RESUMEN: $$PASSED passed, $$FAILED failed"; \
+	test $$FAILED -eq 0
+
+# -----------------------------------------------------------------------------
+# Ejecución - RAM Writer
+# -----------------------------------------------------------------------------
+
+RW_TEST ?= rw_basic_256
+
+run_rw: $(RW_BIN)
+	@mkdir -p $(LOG_DIR)
+	@echo ">>> Ejecutando test TLM ram_writer: $(RW_TEST)..."
+	$(RW_BIN) --vectors=$(VECTORS_DIR) --test=$(RW_TEST) \
+		--log=$(LOG_DIR)/rw_tlm_$(RW_TEST).log
+	@echo ">>> Log: $(LOG_DIR)/rw_tlm_$(RW_TEST).log"
+	@tail -15 $(LOG_DIR)/rw_tlm_$(RW_TEST).log
+
+run_rw_all: $(RW_BIN)
+	@mkdir -p $(LOG_DIR)
+	@echo ">>> Ejecutando todos los tests TLM del RAM writer..."
+	@PASSED=0; FAILED=0; \
+	for TEST in rw_basic_256 rw_partial_100 rw_partial_257 rw_multi_packet rw_near_4kb rw_stress; do \
+		echo ">>> Test: $$TEST"; \
+		$(RW_BIN) --vectors=$(VECTORS_DIR) --test=$$TEST \
+			--log=$(LOG_DIR)/rw_tlm_$$TEST.log; \
+		if [ $$? -eq 0 ]; then \
+			echo "    PASSED"; PASSED=$$((PASSED+1)); \
+		else \
+			echo "    FAILED"; FAILED=$$((FAILED+1)); \
+		fi; \
+	done; \
+	echo "RESUMEN: $$PASSED passed, $$FAILED failed"; \
 	test $$FAILED -eq 0
 
 # -----------------------------------------------------------------------------

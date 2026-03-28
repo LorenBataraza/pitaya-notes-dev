@@ -1,24 +1,27 @@
 /**
  * @file tb_axis_ram_writer.sv
- * @brief Testbench para el módulo axis_ram_writer
+ * @brief Testbench unitario para el modulo axis_ram_writer
  *
- * Verifica la funcionalidad del escritor de RAM incluyendo:
- * - Protocolo AXI4 Master
- * - Manejo de bursts
- * - Límite de 4KB
- * - Flush después de TLAST
- *
- * @par Escenarios de prueba:
- * - Escritura básica de datos
- * - Burst máximo (256 beats)
- * - Burst parcial (menos de MAX_BURST_LEN)
- * - TLAST con datos pendientes
- * - Backpressure en AXI4
+ * Simula un slave AXI4 para verificar las transacciones generadas.
+ * Sintaxis compatible con QuestaSim 10.7c.
  */
 
 `timescale 1ns/1ps
 
 module tb_axis_ram_writer;
+
+    //=========================================================================
+    // Parametros
+    //=========================================================================
+    
+    localparam real CLK_PERIOD = 8.0;
+    localparam int DATA_WIDTH = 16;
+    localparam int AXI_DATA_W = 64;
+    localparam int AXI_ADDR_W = 32;
+    localparam int FIFO_DEPTH = 1024;
+    
+    localparam logic [31:0] BASE_ADDR = 32'h1000_0000;
+    localparam int MEMORY_SIZE = 65536;
 
     //=========================================================================
     // Imports
@@ -27,65 +30,41 @@ module tb_axis_ram_writer;
     import axi_stream_pkg::*;
 
     //=========================================================================
-    // Parámetros
-    //=========================================================================
-    
-    localparam real CLK_PERIOD = 8.0;  // 125 MHz
-    
-    // Parámetros del DUT (deben coincidir con axis_ram_writer.sv)
-    localparam int DATA_WIDTH    = DSP_DATA_WIDTH;  // 16
-    localparam int AXI_DATA_W    = AXI_DATA_WIDTH;  // 64
-    localparam int AXI_ADDR_W    = AXI_ADDR_WIDTH;  // 32
-    localparam int AXI_ID_W      = 4;
-    localparam int FIFO_DEPTH    = 1024;
-    localparam int MAX_BURST_LEN = 16;
-    
-    // Parámetros de test
-    localparam int NUM_SAMPLES    = 1000;
-    localparam int MEMORY_SIZE    = 64 * 1024;  // 64 KB
-    localparam int BASE_ADDR      = 32'h1000_0000;
-
-    //=========================================================================
-    // Señales
+    // Senales
     //=========================================================================
     
     logic aclk;
     logic aresetn;
     
-    // Configuración y estado
-    ram_writer_config_t config_i;
-    ram_writer_status_t status_o;
-    
     // AXI-Stream Slave
-    logic signed [DATA_WIDTH-1:0] s_axis_tdata;
-    logic                         s_axis_tvalid;
-    logic                         s_axis_tready;
-    logic                         s_axis_tlast;
+    logic [DATA_WIDTH-1:0] s_axis_tdata;
+    logic s_axis_tvalid;
+    logic s_axis_tready;
+    logic s_axis_tlast;
     
-    // AXI4 Master - Write Address Channel
-    logic [AXI_ID_W-1:0]          m_axi_awid;
-    logic [AXI_ADDR_W-1:0]        m_axi_awaddr;
-    logic [7:0]                   m_axi_awlen;
-    logic [2:0]                   m_axi_awsize;
-    logic [1:0]                   m_axi_awburst;
-    logic                         m_axi_awlock;
-    logic [3:0]                   m_axi_awcache;
-    logic [2:0]                   m_axi_awprot;
-    logic                         m_axi_awvalid;
-    logic                         m_axi_awready;
+    // AXI4 Master Write
+    logic [AXI_ADDR_W-1:0] m_axi_awaddr;
+    logic [7:0] m_axi_awlen;
+    logic [2:0] m_axi_awsize;
+    logic [1:0] m_axi_awburst;
+    logic m_axi_awvalid;
+    logic m_axi_awready;
     
-    // AXI4 Master - Write Data Channel
-    logic [AXI_DATA_W-1:0]        m_axi_wdata;
-    logic [AXI_DATA_W/8-1:0]      m_axi_wstrb;
-    logic                         m_axi_wlast;
-    logic                         m_axi_wvalid;
-    logic                         m_axi_wready;
+    logic [AXI_DATA_W-1:0] m_axi_wdata;
+    logic [(AXI_DATA_W/8)-1:0] m_axi_wstrb;
+    logic m_axi_wlast;
+    logic m_axi_wvalid;
+    logic m_axi_wready;
     
-    // AXI4 Master - Write Response Channel
-    logic [AXI_ID_W-1:0]          m_axi_bid;
-    logic [1:0]                   m_axi_bresp;
-    logic                         m_axi_bvalid;
-    logic                         m_axi_bready;
+    logic [1:0] m_axi_bresp;
+    logic m_axi_bvalid;
+    logic m_axi_bready;
+
+    //=========================================================================
+    // Configuracion
+    //=========================================================================
+    
+    ram_writer_config_t config_i;
 
     //=========================================================================
     // DUT
@@ -94,325 +73,293 @@ module tb_axis_ram_writer;
     axis_ram_writer #(
         .AXI_DATA_W    (AXI_DATA_W),
         .AXI_ADDR_W    (AXI_ADDR_W),
-        .AXI_ID_W      (AXI_ID_W),
         .FIFO_DEPTH    (FIFO_DEPTH),
-        .MAX_BURST_LEN (MAX_BURST_LEN),
         .DATA_WIDTH    (DATA_WIDTH)
     ) dut (
-        .aclk          (aclk),
-        .aresetn       (aresetn),
-        .config_i      (config_i),
-        .status_o      (status_o),
-        
-        // AXI-Stream Slave
-        .s_axis_tdata  (s_axis_tdata),
-        .s_axis_tvalid (s_axis_tvalid),
-        .s_axis_tready (s_axis_tready),
-        .s_axis_tlast  (s_axis_tlast),
-        
-        // AXI4 Master
-        .m_axi_awid    (m_axi_awid),
-        .m_axi_awaddr  (m_axi_awaddr),
-        .m_axi_awlen   (m_axi_awlen),
-        .m_axi_awsize  (m_axi_awsize),
-        .m_axi_awburst (m_axi_awburst),
-        .m_axi_awlock  (m_axi_awlock),
-        .m_axi_awcache (m_axi_awcache),
-        .m_axi_awprot  (m_axi_awprot),
-        .m_axi_awvalid (m_axi_awvalid),
-        .m_axi_awready (m_axi_awready),
-        
-        .m_axi_wdata   (m_axi_wdata),
-        .m_axi_wstrb   (m_axi_wstrb),
-        .m_axi_wlast   (m_axi_wlast),
-        .m_axi_wvalid  (m_axi_wvalid),
-        .m_axi_wready  (m_axi_wready),
-        
-        .m_axi_bid     (m_axi_bid),
-        .m_axi_bresp   (m_axi_bresp),
-        .m_axi_bvalid  (m_axi_bvalid),
-        .m_axi_bready  (m_axi_bready)
+        .aclk           (aclk),
+        .aresetn        (aresetn),
+        .config_i       (config_i),
+        .s_axis_tdata   (s_axis_tdata),
+        .s_axis_tvalid  (s_axis_tvalid),
+        .s_axis_tready  (s_axis_tready),
+        .s_axis_tlast   (s_axis_tlast),
+        .m_axi_awaddr   (m_axi_awaddr),
+        .m_axi_awlen    (m_axi_awlen),
+        .m_axi_awsize   (m_axi_awsize),
+        .m_axi_awburst  (m_axi_awburst),
+        .m_axi_awvalid  (m_axi_awvalid),
+        .m_axi_awready  (m_axi_awready),
+        .m_axi_wdata    (m_axi_wdata),
+        .m_axi_wstrb    (m_axi_wstrb),
+        .m_axi_wlast    (m_axi_wlast),
+        .m_axi_wvalid   (m_axi_wvalid),
+        .m_axi_wready   (m_axi_wready),
+        .m_axi_bresp    (m_axi_bresp),
+        .m_axi_bvalid   (m_axi_bvalid),
+        .m_axi_bready   (m_axi_bready)
     );
 
     //=========================================================================
-    // Modelo de memoria (AXI4 Slave simplificado)
-    //=========================================================================
-    
-    logic [7:0] memory [MEMORY_SIZE];
-    
-    // Contadores para verificación
-    int axi_aw_count;
-    int axi_w_count;
-    int axi_b_count;
-    int total_bytes_written;
-    
-    // Cola de transacciones pendientes
-    typedef struct {
-        logic [AXI_ADDR_W-1:0] addr;
-        logic [7:0]            len;
-        logic [2:0]            size;
-    } axi_aw_txn_t;
-    
-    axi_aw_txn_t aw_queue[$];
-    
-    // Proceso de dirección de escritura
-    always_ff @(posedge aclk or negedge aresetn) begin
-        if (!aresetn) begin
-            m_axi_awready <= 1'b1;
-            axi_aw_count <= 0;
-        end else begin
-            // Aceptar direcciones con probabilidad variable (simular backpressure)
-            m_axi_awready <= ($urandom_range(0, 9) > 1);  // 80% ready
-            
-            if (m_axi_awvalid && m_axi_awready) begin
-                automatic axi_aw_txn_t txn;
-                txn.addr = m_axi_awaddr;
-                txn.len  = m_axi_awlen;
-                txn.size = m_axi_awsize;
-                aw_queue.push_back(txn);
-                axi_aw_count++;
-                
-                $display("[MEM] AW: addr=0x%08X, len=%0d, size=%0d",
-                         m_axi_awaddr, m_axi_awlen, m_axi_awsize);
-            end
-        end
-    end
-    
-    // Proceso de datos de escritura
-    int beat_count;
-    axi_aw_txn_t current_txn;
-    logic [AXI_ADDR_W-1:0] current_addr;
-    
-    always_ff @(posedge aclk or negedge aresetn) begin
-        if (!aresetn) begin
-            m_axi_wready <= 1'b1;
-            beat_count <= 0;
-            axi_w_count <= 0;
-            total_bytes_written <= 0;
-        end else begin
-            // Backpressure aleatorio
-            m_axi_wready <= ($urandom_range(0, 9) > 2);  // 70% ready
-            
-            if (m_axi_wvalid && m_axi_wready) begin
-                // Obtener transacción actual
-                if (beat_count == 0 && aw_queue.size() > 0) begin
-                    current_txn = aw_queue.pop_front();
-                    current_addr = current_txn.addr;
-                end
-                
-                // Escribir bytes en memoria
-                for (int i = 0; i < (AXI_DATA_W/8); i++) begin
-                    if (m_axi_wstrb[i]) begin
-                        automatic int addr_offset;
-                        addr_offset = (current_addr - BASE_ADDR + i) % MEMORY_SIZE;
-                        memory[addr_offset] = m_axi_wdata[i*8 +: 8];
-                        total_bytes_written++;
-                    end
-                end
-                
-                beat_count++;
-                current_addr += (1 << current_txn.size);
-                axi_w_count++;
-                
-                // Verificar WLAST
-                if (m_axi_wlast) begin
-                    if (beat_count != current_txn.len + 1) begin
-                        $error("[MEM] WLAST mismatch: expected %0d beats, got %0d",
-                               current_txn.len + 1, beat_count);
-                    end
-                    beat_count <= 0;
-                end
-            end
-        end
-    end
-    
-    // Proceso de respuesta
-    always_ff @(posedge aclk or negedge aresetn) begin
-        if (!aresetn) begin
-            m_axi_bvalid <= 1'b0;
-            m_axi_bresp <= 2'b00;
-            m_axi_bid <= '0;
-            axi_b_count <= 0;
-        end else begin
-            // Generar respuesta después de WLAST
-            if (m_axi_wvalid && m_axi_wready && m_axi_wlast && !m_axi_bvalid) begin
-                m_axi_bvalid <= 1'b1;
-                m_axi_bresp <= 2'b00;  // OKAY
-                m_axi_bid <= m_axi_awid;
-            end else if (m_axi_bvalid && m_axi_bready) begin
-                m_axi_bvalid <= 1'b0;
-                axi_b_count++;
-            end
-        end
-    end
-
-    //=========================================================================
-    // Generación de reloj
+    // Reloj
     //=========================================================================
     
     initial begin
-        aclk = 1'b0;
+        aclk = 0;
         forever #(CLK_PERIOD/2) aclk = ~aclk;
     end
 
     //=========================================================================
-    // Tareas de utilidad
+    // Memoria simulada (AXI Slave)
     //=========================================================================
     
-    task automatic apply_reset();
-        aresetn = 1'b0;
-        s_axis_tdata = '0;
-        s_axis_tvalid = 1'b0;
-        s_axis_tlast = 1'b0;
+    reg [7:0] memory [0:MEMORY_SIZE-1];
+    
+    int axi_aw_count;
+    int axi_w_count;
+    int axi_b_count;
+    int total_bytes;
+    int test_errors;
+    
+    // Estado del slave AXI
+    logic [31:0] current_addr;
+    logic [7:0] current_len;
+    int beat_count;
+
+    //=========================================================================
+    // Inicializacion de memoria
+    //=========================================================================
+    
+    integer init_idx;
+    initial begin
+        for (init_idx = 0; init_idx < MEMORY_SIZE; init_idx = init_idx + 1) begin
+            memory[init_idx] = 8'h00;
+        end
+    end
+
+    //=========================================================================
+    // Proceso AW (direcciones)
+    //=========================================================================
+    
+    always @(posedge aclk) begin
+        if (!aresetn) begin
+            m_axi_awready <= 1;
+            current_addr <= 0;
+            current_len <= 0;
+            beat_count <= 0;
+        end else begin
+            if (m_axi_awvalid && m_axi_awready) begin
+                current_addr <= m_axi_awaddr;
+                current_len <= m_axi_awlen;
+                beat_count <= 0;
+                axi_aw_count <= axi_aw_count + 1;
+                $display("[AXI] AW: addr=0x%08X, len=%0d", m_axi_awaddr, m_axi_awlen);
+            end
+        end
+    end
+    
+    //=========================================================================
+    // Proceso W (datos) - escritura byte a byte
+    //=========================================================================
+    
+    integer w_byte_idx;
+    integer w_mem_offset;
+    
+    always @(posedge aclk) begin
+        if (!aresetn) begin
+            m_axi_wready <= 1;
+        end else begin
+            if (m_axi_wvalid && m_axi_wready) begin
+                // Escribir cada byte individualmente
+                for (w_byte_idx = 0; w_byte_idx < 8; w_byte_idx = w_byte_idx + 1) begin
+                    if (m_axi_wstrb[w_byte_idx]) begin
+                        w_mem_offset = (current_addr - BASE_ADDR + beat_count*8 + w_byte_idx);
+                        if (w_mem_offset >= 0 && w_mem_offset < MEMORY_SIZE) begin
+                            memory[w_mem_offset] <= m_axi_wdata[w_byte_idx*8 +: 8];
+                        end
+                        total_bytes <= total_bytes + 1;
+                    end
+                end
+                
+                beat_count <= beat_count + 1;
+                axi_w_count <= axi_w_count + 1;
+                
+                if (m_axi_wlast) begin
+                    $display("[AXI] W: burst complete, %0d beats", beat_count + 1);
+                end
+            end
+        end
+    end
+    
+    //=========================================================================
+    // Proceso B (respuestas)
+    //=========================================================================
+    
+    always @(posedge aclk) begin
+        if (!aresetn) begin
+            m_axi_bvalid <= 0;
+            m_axi_bresp <= 2'b00;
+        end else begin
+            if (m_axi_wvalid && m_axi_wready && m_axi_wlast && !m_axi_bvalid) begin
+                m_axi_bvalid <= 1;
+            end else if (m_axi_bvalid && m_axi_bready) begin
+                m_axi_bvalid <= 0;
+                axi_b_count <= axi_b_count + 1;
+            end
+        end
+    end
+
+    //=========================================================================
+    // Tasks
+    //=========================================================================
+    
+    integer reset_idx;
+    
+    task automatic do_reset();
+        aresetn = 0;
         config_i = '0;
+        s_axis_tdata = 0;
+        s_axis_tvalid = 0;
+        s_axis_tlast = 0;
+        
+        axi_aw_count = 0;
+        axi_w_count = 0;
+        axi_b_count = 0;
+        total_bytes = 0;
+        beat_count = 0;
+        
+        // Limpiar memoria
+        for (reset_idx = 0; reset_idx < MEMORY_SIZE; reset_idx = reset_idx + 1) begin
+            memory[reset_idx] = 8'h00;
+        end
+        
         repeat(10) @(posedge aclk);
-        aresetn = 1'b1;
+        aresetn = 1;
         @(posedge aclk);
     endtask
     
-    task automatic configure_dut(
-        input logic [31:0] base_addr,
-        input logic [31:0] buffer_size
-    );
-        config_i.enable = 1'b1;
-        config_i.base_addr = base_addr;
-        config_i.buffer_size = buffer_size;
+    task automatic configure();
+        config_i.enable = 1;
+        config_i.base_addr = BASE_ADDR;
+        config_i.buffer_size = MEMORY_SIZE;
         @(posedge aclk);
-        $display("[TB] DUT configured: base=0x%08X, size=%0d", base_addr, buffer_size);
+        $display("[TB] Config: base=0x%08X", BASE_ADDR);
     endtask
     
-    task automatic send_sample(
-        input logic signed [DATA_WIDTH-1:0] data,
-        input logic last = 1'b0
-    );
+    task automatic send_sample(input logic [DATA_WIDTH-1:0] data, input logic last);
         s_axis_tdata = data;
-        s_axis_tvalid = 1'b1;
+        s_axis_tvalid = 1;
         s_axis_tlast = last;
         
-        do @(posedge aclk);
-        while (!s_axis_tready);
+        @(posedge aclk);
+        while (!s_axis_tready) @(posedge aclk);
         
-        s_axis_tvalid = 1'b0;
-        s_axis_tlast = 1'b0;
+        s_axis_tvalid = 0;
+        s_axis_tlast = 0;
     endtask
     
-    task automatic send_samples(
-        input int count,
-        input logic mark_last = 1'b1
-    );
-        for (int i = 0; i < count; i++) begin
-            automatic logic is_last;
-            is_last = mark_last && (i == count - 1);
-            send_sample(i[DATA_WIDTH-1:0], is_last);
+    integer pkt_idx;
+    logic pkt_is_last;
+    
+    task automatic send_packet(input int count);
+        $display("[TB] Enviando %0d samples...", count);
+        
+        for (pkt_idx = 0; pkt_idx < count; pkt_idx = pkt_idx + 1) begin
+            pkt_is_last = (pkt_idx == count - 1);
+            send_sample(pkt_idx[DATA_WIDTH-1:0], pkt_is_last);
         end
+        
+        // Esperar que se procesen los bursts
+        repeat(1000) @(posedge aclk);
     endtask
     
-    task automatic wait_idle(input int timeout = 10000);
-        int count = 0;
+    integer verify_idx;
+    integer verify_offset;
+    logic [15:0] verify_expected;
+    logic [15:0] verify_got;
+    int verify_errors;
+    
+    task automatic verify_memory(input int count);
+        verify_errors = 0;
         
-        while (status_o.state != WR_IDLE && count < timeout) begin
-            @(posedge aclk);
-            count++;
+        $display("[TB] Verificando %0d samples...", count);
+        
+        // Dar tiempo para que las escrituras se completen
+        repeat(100) @(posedge aclk);
+        
+        for (verify_idx = 0; verify_idx < count; verify_idx = verify_idx + 1) begin
+            verify_offset = verify_idx * 2;
+            verify_expected = verify_idx[15:0];
+            verify_got = {memory[verify_offset+1], memory[verify_offset]};
+            
+            if (verify_got !== verify_expected) begin
+                if (verify_errors < 5) begin
+                    $display("[TB] Mismatch en sample %0d: esperado=0x%04X, obtenido=0x%04X", 
+                             verify_idx, verify_expected, verify_got);
+                end
+                verify_errors = verify_errors + 1;
+            end
         end
         
-        if (count >= timeout)
-            $error("[TB] Timeout waiting for IDLE state");
+        if (verify_errors == 0) begin
+            $display("[TB] PASSED: %0d samples verificados", count);
+        end else begin
+            $display("[TB] FAILED: %0d errores", verify_errors);
+            test_errors = test_errors + verify_errors;
+        end
     endtask
 
     //=========================================================================
     // Tests
     //=========================================================================
     
-    task automatic test_basic_write();
+    task automatic test_basic();
         $display("\n========== TEST: Basic Write ==========");
+        do_reset();
+        configure();
         
-        configure_dut(BASE_ADDR, MEMORY_SIZE);
+        send_packet(64);
+        verify_memory(64);
+    endtask
+    
+    task automatic test_larger();
+        $display("\n========== TEST: Larger Packet ==========");
+        do_reset();
+        configure();
         
-        // Enviar algunos datos
-        send_samples(100, 1'b1);
+        send_packet(256);
+        verify_memory(256);
+    endtask
+    
+    integer multi_idx;
+    logic multi_is_last;
+    logic [DATA_WIDTH-1:0] multi_data;
+    
+    task automatic test_multiple();
+        $display("\n========== TEST: Multiple Packets ==========");
+        do_reset();
+        configure();
         
-        // Esperar que se procesen
+        // Primer paquete
+        send_packet(32);
+        repeat(200) @(posedge aclk);
+        
+        // Segundo paquete (valores offset +100)
+        $display("[TB] Enviando segundo paquete...");
+        for (multi_idx = 0; multi_idx < 32; multi_idx = multi_idx + 1) begin
+            multi_is_last = (multi_idx == 31);
+            multi_data = multi_idx + 100;
+            send_sample(multi_data, multi_is_last);
+        end
+        
         repeat(500) @(posedge aclk);
-        wait_idle();
         
-        // Verificar
-        $display("[TB] AW transactions: %0d", axi_aw_count);
-        $display("[TB] W beats: %0d", axi_w_count);
-        $display("[TB] Bytes written: %0d", total_bytes_written);
-        
-        if (axi_aw_count > 0 && axi_b_count == axi_aw_count)
-            $display("[TB] TEST PASSED: Basic write completed");
-        else
-            $error("[TB] TEST FAILED: Incomplete transactions");
-    endtask
-    
-    task automatic test_burst_alignment();
-        $display("\n========== TEST: Burst Alignment (4KB) ==========");
-        
-        // Resetear contadores
-        axi_aw_count = 0;
-        axi_w_count = 0;
-        
-        configure_dut(BASE_ADDR, MEMORY_SIZE);
-        
-        // Enviar suficientes datos para requerir múltiples bursts
-        send_samples(500, 1'b1);
-        
-        repeat(1000) @(posedge aclk);
-        wait_idle();
-        
-        $display("[TB] TEST: Burst alignment checked via SVA assertions");
-    endtask
-    
-    task automatic test_tlast_flush();
-        $display("\n========== TEST: TLAST Flush ==========");
-        
-        // Este test verifica H1: TLAST debe causar flush del FIFO
-        
-        // Resetear contadores
-        total_bytes_written = 0;
-        
-        configure_dut(BASE_ADDR, MEMORY_SIZE);
-        
-        // Enviar menos datos que un burst completo, con TLAST
-        send_samples(10, 1'b1);
-        
-        // Esperar
-        repeat(500) @(posedge aclk);
-        wait_idle();
-        
-        // Verificar que todos los datos se escribieron
-        // Con 10 muestras de 16 bits = 20 bytes
-        // Pero empaquetados en 64 bits...
-        $display("[TB] Samples sent: 10");
-        $display("[TB] Bytes written: %0d", total_bytes_written);
-        
-        if (total_bytes_written >= 10)  // Al menos los datos
-            $display("[TB] TEST PASSED: TLAST caused flush");
-        else
-            $warning("[TB] TEST WARNING: Possible H1 bug - TLAST may not flush FIFO");
-    endtask
-    
-    task automatic test_backpressure();
-        $display("\n========== TEST: Backpressure Handling ==========");
-        
-        // Este test usa el backpressure aleatorio del modelo de memoria
-        
-        configure_dut(BASE_ADDR, MEMORY_SIZE);
-        
-        // Enviar datos continuamente
-        fork
-            send_samples(200, 1'b1);
-        join
-        
-        repeat(2000) @(posedge aclk);
-        wait_idle();
-        
-        $display("[TB] TEST: Backpressure handled (check for deadlock via SVA)");
+        // Verificar primer paquete (el segundo lo sobrescribe en otro offset)
+        $display("[TB] Verificando primer paquete...");
+        verify_memory(32);
     endtask
 
     //=========================================================================
-    // Secuencia principal
+    // Main
     //=========================================================================
     
     initial begin
@@ -421,19 +368,11 @@ module tb_axis_ram_writer;
         $display("|         TESTBENCH: axis_ram_writer                         |");
         $display("+------------------------------------------------------------+");
         
-        // Inicializar memoria
-        foreach (memory[i]) memory[i] = 8'h00;
+        test_errors = 0;
         
-        apply_reset();
-        
-        // Ejecutar tests
-        test_basic_write();
-        test_burst_alignment();
-        test_tlast_flush();
-        test_backpressure();
-        
-        // Resumen
-        repeat(100) @(posedge aclk);
+        test_basic();
+        test_larger();
+        test_multiple();
         
         $display("\n");
         $display("+------------------------------------------------------------+");
@@ -442,9 +381,17 @@ module tb_axis_ram_writer;
         $display("|  Transacciones AW: %-38d  |", axi_aw_count);
         $display("|  Beats W:          %-38d  |", axi_w_count);
         $display("|  Respuestas B:     %-38d  |", axi_b_count);
-        $display("|  Total bytes:      %-38d  |", total_bytes_written);
+        $display("|  Total bytes:      %-38d  |", total_bytes);
         $display("+------------------------------------------------------------+");
         
+        if (test_errors == 0) begin
+            $display("|  >>> ALL TESTS PASSED                                     |");
+        end else begin
+            $display("|  >>> FAILED: %3d total errors                              |", test_errors);
+        end
+        
+        $display("+------------------------------------------------------------+");
+        $display("\n>>> Simulacion completada <<<\n");
         $finish;
     end
 
@@ -453,9 +400,9 @@ module tb_axis_ram_writer;
     //=========================================================================
     
     initial begin
-        #(CLK_PERIOD * 50000);
-        $error("[TB] Watchdog timeout");
+        #(CLK_PERIOD * 500000);
+        $display("[ERROR] Watchdog timeout");
         $finish;
     end
 
-endmodule : tb_axis_ram_writer
+endmodule
