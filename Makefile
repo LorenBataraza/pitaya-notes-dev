@@ -479,6 +479,10 @@ tmp/%.tree/system-top.dts: tmp/%.xsa $(DTREE_DIR)
 	$(XSCT) scripts/devicetree.tcl $* $(PROC) $(DTREE_DIR)
 	sed -i 's|#include|/include/|' $@
 
+## @brief Export block design TCL from an open project (after GUI edits)
+export-bd: tmp/$(NAME).xpr
+	$(VIVADO) -source scripts/export_bd.tcl -tclargs $(NAME)
+	
 # =============================================================================
 # Cleanup
 # =============================================================================
@@ -551,3 +555,5 @@ clean_projects:
 	    ! -name 'device-tree-xlnx-$(DTREE_TAG)' \
 	    ! -name 'u-boot-xlnx-$(UBOOT_TAG)' \
 	    -exec $(RM) -rf {} +
+	    
+

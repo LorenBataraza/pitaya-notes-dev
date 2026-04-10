@@ -9,87 +9,190 @@ z2
 cModel Technology
 Z0 d/home/lorenzo/PI/red-pitaya-dev/scripts
 T_opt
-!s110 1774680600
-VfX]1M1SPH@VDZQaB<[45K3
-04 18 4 work tb_axis_ram_writer fast 0
-=1-000ae431a4f1-69c77a18-5dbb7-c44d
+!s110 1775833245
+V]En:R7kA?e_GCX8eS[Mm;1
+04 20 4 work tb_acquisition_chain fast 0
+=1-000ae431a4f1-69d9109d-1fba3-4483
 o-quiet -auto_acc_if_foreign -work work +nowarnTFMPC +acc
 Z1 tCvgOpt 0
 n@_opt
 OL;O;10.7c;67
-Xaxi_stream_pkg
+R0
+Yaxi4_write_simple_if
 Z2 DXx6 sv_std 3 std 0 22 d=_JfHTnXCN[H5FjiaJJc0
-Z3 !s110 1774680599
+Z3 !s110 1775833308
+!i10b 1
+!s100 bUiPZ7nlhXVYZVX:_5[P83
+Izn>][Yii?a1PICGXE=PZX0
+Z4 VDg1SIo80bB@j0V0VzS_@n1
+!s105 axi4_write_simple_if_sv_unit
+S1
+R0
+w1775578794
+8../tb/integration/axi4_write_simple_if.sv
+F../tb/integration/axi4_write_simple_if.sv
+L0 12
+Z5 OL;L;10.7c;67
+r1
+!s85 0
+31
+Z6 !s108 1775833308.000000
+!s107 ../tb/integration/axi4_write_simple_if.sv|
+!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../tb/integration/axi4_write_simple_if.sv|
+!i113 0
+Z7 o-suppress 2583 -suppress 13314 -sv -work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z8 !s92 -suppress 2583 -suppress 13314 -sv -work work +incdir+../rtl/common -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R1
+Xaxi_stream_pkg
+R2
+R3
 !i10b 1
 !s100 5j@0@U<3H@KKjK>0KcT<02
 IKa^baY;4zjkRl79h=`d8n0
 VKa^baY;4zjkRl79h=`d8n0
 S1
 R0
-w1774679981
+w1775578966
 8../rtl/common/axi_stream_pkg.sv
 F../rtl/common/axi_stream_pkg.sv
 L0 24
-Z4 OL;L;10.7c;67
+R5
 r1
 !s85 0
 31
-Z5 !s108 1774680599.000000
+R6
 !s107 ../rtl/common/axi_stream_pkg.sv|
 !s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../rtl/common/axi_stream_pkg.sv|
 !i113 0
-Z6 o-suppress 2583 -suppress 13314 -sv -work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-Z7 !s92 -suppress 2583 -suppress 13314 -sv -work work +incdir+../rtl/common -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R7
+R8
 R1
 vaxis_ram_writer
 R2
-Z8 DXx4 work 14 axi_stream_pkg 0 22 Ka^baY;4zjkRl79h=`d8n0
+Z9 DXx4 work 14 axi_stream_pkg 0 22 Ka^baY;4zjkRl79h=`d8n0
 R3
 !i10b 1
 !s100 S7=T1FzgDYIXH>kz6eiOe0
 I?`UFeIz<QVN<@dEOE:gKO0
-Z9 VDg1SIo80bB@j0V0VzS_@n1
+R4
 !s105 axis_ram_writer_sv_unit
 S1
 R0
-w1774680275
+w1775832578
 8../rtl/ram_writer/axis_ram_writer.sv
 F../rtl/ram_writer/axis_ram_writer.sv
 L0 41
-R4
+R5
 r1
 !s85 0
 31
-R5
+R6
 !s107 ../rtl/ram_writer/axis_ram_writer.sv|
 !s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../rtl/ram_writer/axis_ram_writer.sv|
 !i113 0
-R6
 R7
-R1
-vtb_axis_ram_writer
-R2
 R8
+R1
+vaxis_scope
+R2
+R9
 R3
 !i10b 1
-!s100 Sa`Z7GW>kJYjT8FCBL5OB0
-ITYo]XQj8jB=WUXifUY1;A2
-R9
-!s105 tb_axis_ram_writer_sv_unit
+!s100 9PKg<2;XXmzkngA1>VODW2
+I9F^eKjO<Rilk[DcYAYFY00
+R4
+!s105 axis_scope_sv_unit
 S1
 R0
-w1774680595
-8../tb/unit/tb_axis_ram_writer.sv
-F../tb/unit/tb_axis_ram_writer.sv
-L0 11
-R4
+w1775578964
+8../rtl/scope/axis_scope.sv
+F../rtl/scope/axis_scope.sv
+L0 50
+R5
 r1
 !s85 0
 31
-R5
-!s107 ../tb/unit/tb_axis_ram_writer.sv|
-!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../tb/unit/tb_axis_ram_writer.sv|
-!i113 0
 R6
+!s107 ../rtl/scope/axis_scope.sv|
+!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../rtl/scope/axis_scope.sv|
+!i113 0
 R7
+R8
+R1
+vaxis_trigger
+R2
+R9
+R3
+!i10b 1
+!s100 DiQOjJ8cG:oGk0PCd4m9C2
+IAF=6hdP_a>ND14[G1Rh^>2
+R4
+!s105 axis_trigger_sv_unit
+S1
+R0
+Z10 w1775578965
+8../rtl/trigger/axis_trigger.sv
+F../rtl/trigger/axis_trigger.sv
+L0 54
+R5
+r1
+!s85 0
+31
+R6
+!s107 ../rtl/trigger/axis_trigger.sv|
+!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../rtl/trigger/axis_trigger.sv|
+!i113 0
+R7
+R8
+R1
+vtb_acquisition_chain
+R2
+R9
+R3
+!i10b 1
+!s100 1Mim=jbN97Oz?cFmWQhIh3
+IVE==UL3gBk61fdVG3W=5m0
+R4
+!s105 tb_acquisition_chain_sv_unit
+S1
+R0
+w1775833239
+8../tb/integration/tb_acquisition_chain.sv
+F../tb/integration/tb_acquisition_chain.sv
+L0 28
+R5
+r1
+!s85 0
+31
+R6
+!s107 ../tb/integration/tb_acquisition_chain.sv|
+!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../tb/integration/tb_acquisition_chain.sv|
+!i113 0
+R7
+R8
+R1
+vtrigger_combiner
+R2
+R3
+!i10b 1
+!s100 RehKXNP<:;9a^mDdzKnbn2
+IG<=e8F6_Umm?Eia::Ui:`0
+R4
+!s105 trigger_combiner_sv_unit
+S1
+R0
+R10
+8../rtl/trigger/trigger_combiner.sv
+F../rtl/trigger/trigger_combiner.sv
+L0 22
+R5
+r1
+!s85 0
+31
+R6
+!s107 ../rtl/trigger/trigger_combiner.sv|
+!s90 -sv|-work|work|+incdir+../rtl/common|-suppress|2583|-suppress|13314|../rtl/trigger/trigger_combiner.sv|
+!i113 0
+R7
+R8
 R1

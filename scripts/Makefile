@@ -62,11 +62,21 @@ SCOPE_TB    := $(TB_DIR)/unit/tb_axis_scope.sv
 RW_RTL      := $(RTL_DIR)/ram_writer/axis_ram_writer.sv
 RW_TB       := $(TB_DIR)/unit/tb_axis_ram_writer.sv
 
+# Integración
+TRIG_COMB_RTL := $(RTL_DIR)/trigger/trigger_combiner.sv
+# Interface AXI4 simplificada (sin clocking blocks)
+AXI4_SIMPLE_IF := $(TB_DIR)/integration/axi4_write_simple_if.sv
+# Agent UVM completo (para tests UVM futuros)
+AXI4_AGENT    := $(TB_DIR)/agents/axi4_write/axi4_write_if.sv \
+                 $(TB_DIR)/agents/axi4_write/axi4_write_pkg.sv
+INTEG_TB      := $(TB_DIR)/integration/tb_acquisition_chain.sv
+
 # -----------------------------------------------------------------------------
 # Targets principales
 # -----------------------------------------------------------------------------
 .PHONY: all clean vectors lib compile sim_trigger sim_scope sim_rw \
-        gui_trigger gui_scope gui_rw regression help
+        gui_trigger gui_scope gui_rw regression help \
+        compile_integration sim_integration gui_integration
 
 all: lib compile
 
@@ -80,6 +90,7 @@ help:
 	@echo "  make lib         - Crear biblioteca de trabajo"
 	@echo "  make compile     - Compilar todos los fuentes"
 	@echo ""
+	@echo "  === Tests Unitarios ==="
 	@echo "  make sim_trigger - Simular trigger (batch)"
 	@echo "  make sim_scope   - Simular scope (batch)"
 	@echo "  make sim_rw      - Simular RAM writer (batch)"
@@ -87,6 +98,11 @@ help:
 	@echo "  make gui_trigger - Simular trigger (GUI + waves)"
 	@echo "  make gui_scope   - Simular scope (GUI + waves)"
 	@echo "  make gui_rw      - Simular RAM writer (GUI + waves)"
+	@echo ""
+	@echo "  === Test de Integracion ==="
+	@echo "  make compile_integration - Compilar cadena completa"
+	@echo "  make sim_integration     - Simular integracion (batch)"
+	@echo "  make gui_integration     - Simular integracion (GUI)"
 	@echo ""
 	@echo "  make regression  - Ejecutar todos los tests (batch)"
 	@echo "  make clean       - Limpiar archivos generados"
@@ -199,10 +215,38 @@ regression: $(LOG_DIR)
 	@echo "  REGRESIÓN COMPLETA"
 	@echo "============================================================"
 	@$(MAKE) sim_trigger
+	@$(MAKE) sim_scope
 	@$(MAKE) sim_rw
+	@$(MAKE) sim_integration
 	@echo ""
 	@echo ">>> Regresión completada. Revisar logs en $(LOG_DIR)/"
 	@grep -h "PASS\|FAIL" $(LOG_DIR)/*.log || true
+
+# -----------------------------------------------------------------------------
+# Testbench de Integración
+# -----------------------------------------------------------------------------
+compile_integration: compile_pkg
+	@echo ">>> Compilando modulos RTL para integracion..."
+	$(VLOG) $(VLOG_OPTS) $(TRIGGER_RTL)
+	$(VLOG) $(VLOG_OPTS) $(TRIG_COMB_RTL)
+	$(VLOG) $(VLOG_OPTS) $(SCOPE_RTL)
+	$(VLOG) $(VLOG_OPTS) $(RW_RTL)
+	@echo ">>> Compilando interface AXI4 simplificada..."
+	$(VLOG) $(VLOG_OPTS) $(AXI4_SIMPLE_IF)
+	@echo ">>> Compilando testbench de integracion..."
+	$(VLOG) $(VLOG_OPTS) $(INTEG_TB)
+	@echo ">>> Compilacion de integracion completa"
+
+sim_integration: compile_integration $(LOG_DIR)
+	@echo ">>> Simulando cadena de adquisicion (batch)..."
+	$(VSIM) $(VSIM_BATCH) tb_acquisition_chain \
+		-l $(LOG_DIR)/integration_sim.log
+	@echo ">>> Log guardado en $(LOG_DIR)/integration_sim.log"
+
+gui_integration: compile_integration $(WAVE_DIR)
+	@echo ">>> Abriendo GUI para integracion..."
+	$(VSIM) $(VSIM_OPTS) tb_acquisition_chain \
+		-do "add wave -r /*; run -all"
 
 # -----------------------------------------------------------------------------
 # Limpieza
