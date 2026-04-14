@@ -1,9 +1,0 @@
-============================================================
-TEST VECTOR GENERATION REPORT
-============================================================
-
-Test name: rw_near_4kb
-Total samples: 1024
-Packet sizes: [1024]
-Expected bytes: 4096
-Estimated bursts: 4

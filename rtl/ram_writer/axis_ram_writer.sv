@@ -290,7 +290,14 @@ module axis_ram_writer
                 end
             end
             
-            if (state == WR_IDLE) begin
+            // Reset last_seen solo cuando:
+            // 1. Se deshabilita el módulo
+            // 2. La transferencia terminó exitosamente (FIFO vacío después de ver tlast)
+            if (!config_i.enable) begin
+                last_seen <= 1'b0;
+            end
+            else if (state == WR_RESP && m_axi_bvalid && m_axi_bready && 
+                     m_axi_bresp == 2'b00 && fifo_empty && last_seen) begin
                 last_seen <= 1'b0;
             end
         end

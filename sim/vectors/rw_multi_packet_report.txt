@@ -1,9 +1,0 @@
-============================================================
-TEST VECTOR GENERATION REPORT
-============================================================
-
-Test name: rw_multi_packet
-Total samples: 500
-Packet sizes: [100, 150, 250]
-Expected bytes: 2000
-Estimated bursts: 2

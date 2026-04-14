@@ -1,4 +1,0 @@
-// Trigger events detected: 1
-// Format: INDEX VALUE PREV_VALUE
-
-488 499 498

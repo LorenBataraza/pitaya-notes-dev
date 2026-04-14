@@ -1,9 +1,0 @@
-============================================================
-TEST VECTOR GENERATION REPORT
-============================================================
-
-Test name: rw_basic_256
-Total samples: 256
-Packet sizes: [256]
-Expected bytes: 1024
-Estimated bursts: 1

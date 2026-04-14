@@ -174,6 +174,9 @@ module axis_scope
     
     /** @brief Registro de datos leídos del buffer */
     logic signed [DATA_WIDTH-1:0] read_data;
+    
+    /** @brief Indica que read_data tiene un valor válido (maneja latencia de lectura) */
+    logic read_valid;
 
     //=========================================================================
     // Lógica de handshake
@@ -355,6 +358,22 @@ module axis_scope
     always_ff @(posedge aclk) begin : proc_buffer_read
         read_data <= sample_buffer[read_ptr];
     end
+    
+    /**
+     * @brief Control de validez de lectura
+     * 
+     * La lectura del buffer tiene 1 ciclo de latencia (read_data es un registro).
+     * Esta señal se activa 1 ciclo después de entrar a ST_TRANSFER,
+     * asegurando que read_data tenga un valor válido antes de activar tvalid.
+     */
+    always_ff @(posedge aclk or negedge aresetn) begin : proc_read_valid
+        if (!aresetn) begin
+            read_valid <= 1'b0;
+        end
+        else begin
+            read_valid <= (state == ST_TRANSFER);
+        end
+    end
 
     //=========================================================================
     // Control de flujo AXI-Stream
@@ -374,11 +393,15 @@ module axis_scope
     
     /**
      * @brief Generación de señales de salida
+     * 
+     * tvalid solo se activa cuando read_valid=1, lo que garantiza
+     * que read_data tiene un valor válido del buffer (1 ciclo después
+     * de entrar a ST_TRANSFER).
      */
     always_comb begin : proc_output
         m_axis_tdata  = read_data;
-        m_axis_tvalid = (state == ST_TRANSFER);
-        m_axis_tlast  = (state == ST_TRANSFER) && 
+        m_axis_tvalid = (state == ST_TRANSFER) && read_valid;
+        m_axis_tlast  = (state == ST_TRANSFER) && read_valid &&
                         (transfer_count == total_samples - 1);
     end
 
