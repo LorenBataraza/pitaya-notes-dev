@@ -153,20 +153,10 @@ PROJ_DIR = tmp/$(NAME)
 ## @details $(wildcard ...) is expanded at parse time, before any rule runs,
 ##          so it captures the directory contents as they exist on disk.
 FILES = $(shell find cores -name '*.v' -type f)
-
-## @brief Core names derived from FILES, with the path prefix and .v stripped.
-## @details The substitution $(FILES:.v=) removes the .v suffix, leaving paths
-##          like cores/axis_fifo. These are passed to addprefix to form the
-##          actual targets: tmp/cores/axis_fifo, tmp/cores/axis_red_pitaya_adc, etc.
-##
-## @par Example: if cores/ contains axis_fifo.v and axis_red_pitaya_adc.v:
-## @code
-##   FILES = cores/axis_fifo.v cores/axis_red_pitaya_adc.v
-##   CORES = cores/axis_fifo cores/axis_red_pitaya_adc
-##   # addprefix tmp/ expands to:
-##   #   tmp/cores/axis_fifo tmp/cores/axis_red_pitaya_adc
-## @endcode
 CORES = $(FILES:.v=)
+
+FILES_SV   = $(shell find rtl -name '*.sv' -not -name '*_pkg.sv' -type f)
+CORES_SV   = $(FILES_SV:.sv=)
 
 # Prevent make from deleting intermediate files that match pattern rules.
 # tmp/cores/% is included so compiled cores survive between invocations even
@@ -249,10 +239,10 @@ os-image: $(PROJ_DIR)/boot-rootfs.bin $(PROJ_DIR)/rootfs.dtb \
 	cp $(PROJ_DIR)/boot-rootfs.bin  boot-rootfs.bin
 	cp $(PROJ_DIR)/rootfs.dtb       rootfs.dtb
 	cp $(PROJ_DIR)/uEnv-rootfs.txt  uEnv-rootfs.txt
-	sudo sh scripts/image.sh scripts/debian.sh \
-	    red-pitaya-debian-13-armhf-$(DATE).img 2048
+	sudo --preserve-env=http_proxy,https_proxy,HTTP_PROXY,HTTPS_PROXY,no_proxy,NO_PROXY \
+	    sh scripts/image.sh scripts/debian.sh \
+	    red-pitaya-debian-$(NAME)-13-armhf-$(DATE).img 2048
 	$(RM) boot-rootfs.bin rootfs.dtb uEnv-rootfs.txt
-
 # =============================================================================
 # Download rules
 # All outputs land in tmp/ so make tracks them by timestamp.
@@ -436,6 +426,7 @@ $(PROJ_DIR)/uEnv-initrd.txt: dts/uEnv-initrd.txt
 ##   make cores   # build all cores without building any project
 ## @endcode
 cores: $(addprefix tmp/, $(CORES))
+cores_dev: $(addprefix tmp/cores/dev/, $(CORES_SV))
 
 ## @brief Compile a single Verilog core into a Vivado IP block.
 ## @details The pattern stem % matches the core name (e.g. axis_fifo).
@@ -446,6 +437,10 @@ cores: $(addprefix tmp/, $(CORES))
 tmp/cores/%: cores/%.v
 	mkdir -p $(@D)
 	$(VIVADO) -source scripts/core.tcl -tclargs $* $(PART)
+	
+tmp/cores/dev/%: rtl/%.sv
+	mkdir -p $(@D)
+	$(VIVADO) -source scripts/core_sv.tcl -tclargs $< $* $(PART)
 
 ## @brief Create a Vivado project from the block design TCL script.
 ## @details All cores in $(CORES) are compiled first (see tmp/cores/% rule).
